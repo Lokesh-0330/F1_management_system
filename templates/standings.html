@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}Standings{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+    <p class="eyebrow">Championship // Live Classification</p>
+    <h1 class="page-title">Standings</h1>
+</div>
+
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+
+    <!-- DRIVER STANDINGS (View_Driver_Standings) -->
+    <section class="panel xl:col-span-2">
+        <div class="panel-head">
+            <h2>Drivers' Championship</h2>
+            <span class="tag">View_Driver_Standings</span>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="tele">
+                <thead>
+                    <tr>
+                        <th>Pos</th><th>No</th><th>Driver</th><th>Team</th>
+                        <th class="num">Wins</th><th class="num">Podiums</th><th class="num">Pts</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for d in drivers %}
+                    <tr class="{% if d.standing_pos == 1 %}lead{% endif %}">
+                        <td class="mono font-bold">{{ "%02d"|format(d.standing_pos) }}</td>
+                        <td class="mono muted">{{ d.driver_number }}</td>
+                        <td>
+                            <span class="chip" style="--team-color: {{ TEAM_COLORS.get(d.team_name, '#2A2E3D') }}; background-color: var(--team-color);"></span>
+                            <span class="font-bold uppercase">{{ d.driver_name }}</span>
+                            <span class="tag ml-2">{{ d.code }}</span>
+                        </td>
+                        <td class="muted">{{ d.team_name }}</td>
+                        <td class="num">{{ d.wins }}</td>
+                        <td class="num">{{ d.podiums }}</td>
+                        <td class="num font-bold text-lg">{{ d.total_points }}</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="7" class="empty">NO DRIVER DATA AVAILABLE</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- CONSTRUCTOR STANDINGS (View_Constructor_Standings) -->
+    <section class="panel">
+        <div class="panel-head">
+            <h2>Constructors</h2>
+            <span class="tag">View_Constructor_Standings</span>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="tele">
+                <thead>
+                    <tr><th>Pos</th><th>Team</th><th class="num">Wins</th><th class="num">Pts</th></tr>
+                </thead>
+                <tbody>
+                    {% for c in constructors %}
+                    <tr class="{% if c.standing_pos == 1 %}lead{% endif %}">
+                        <td class="mono font-bold">{{ "%02d"|format(c.standing_pos) }}</td>
+                        <td style="min-width: 9rem;">
+                            <span class="chip" style="--team-color: {{ TEAM_COLORS.get(c.team_name, '#2A2E3D') }}; background-color: var(--team-color);"></span>
+                            <span class="font-bold uppercase">{{ c.team_name }}</span>
+                        </td>
+                        <td class="num">{{ c.wins }}</td>
+                        <td class="num font-bold text-lg">{{ c.total_points }}</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="4" class="empty">NO TEAM DATA AVAILABLE</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+
+<!-- PIT CREW ANALYTICS -->
+<details class="sub mt-6">
+    <summary>
+        <span>Pit Crew Performance <span class="tag ml-3">GROUP BY team &middot; HAVING stops &ge; 2</span></span>
+        <span class="arrow">&#9658;</span>
+    </summary>
+    <div class="overflow-x-auto">
+        <table class="tele">
+            <thead>
+                <tr><th>Team</th><th class="num">Stops</th><th class="num">Avg Stop (s)</th><th class="num">Fastest (s)</th></tr>
+            </thead>
+            <tbody>
+                {% for p in pit_stats %}
+                <tr>
+                    <td>
+                        <span class="chip" style="background-color: {{ TEAM_COLORS.get(p.team_name, '#2A2E3D') }};"></span>
+                        <span class="font-bold uppercase">{{ p.team_name }}</span>
+                    </td>
+                    <td class="num">{{ p.stops }}</td>
+                    <td class="num">{{ "%.2f"|format(p.avg_stop) }}</td>
+                    <td class="num font-bold">{{ "%.2f"|format(p.fastest_stop) }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="4" class="empty">NO PIT STOP DATA AVAILABLE</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</details>
+{% endblock %}

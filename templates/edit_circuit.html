@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Edit Circuit{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+    <p class="eyebrow">Track Data // Update Entry</p>
+    <h1 class="page-title">Edit Circuit</h1>
+</div>
+
+<section class="panel max-w-2xl">
+    <div class="panel-head"><h2>{{ entry.name }}</h2><span class="tag">UPDATE</span></div>
+    <form method="post" action="{{ url_for('edit_circuit', circuit_id=entry.circuit_id) }}" class="p-5 space-y-4">
+        <div>
+            <label class="lbl" for="name">Circuit name</label>
+            <input id="name" name="name" type="text" maxlength="80" value="{{ form.get('name', '') }}" class="field" required>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label class="lbl" for="city">City</label>
+                <input id="city" name="city" type="text" maxlength="60" value="{{ form.get('city', '') }}" class="field" required>
+            </div>
+            <div>
+                <label class="lbl" for="country">Country</label>
+                <input id="country" name="country" type="text" maxlength="60" value="{{ form.get('country', '') }}" class="field" required>
+            </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label class="lbl" for="length_km">Length (km)</label>
+                <input id="length_km" name="length_km" type="number" step="0.001" min="0.1" max="25" value="{{ form.get('length_km', '') }}" class="field" required>
+            </div>
+            <div>
+                <label class="lbl" for="race_laps">Race laps</label>
+                <input id="race_laps" name="race_laps" type="number" min="1" max="100" value="{{ form.get('race_laps', '') }}" class="field" required>
+            </div>
+        </div>
+        <div>
+            <label class="lbl" for="lap_record">Lap record (optional)</label>
+            <input id="lap_record" name="lap_record" type="text" placeholder="1:19.813" pattern="\d{1,2}:[0-5]\d\.\d{1,3}" value="{{ form.get('lap_record', '') }}" class="field">
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label class="lbl" for="record_holder">Record holder</label>
+                <input id="record_holder" name="record_holder" type="text" maxlength="60" value="{{ form.get('record_holder', '') }}" class="field">
+            </div>
+            <div>
+                <label class="lbl" for="record_year">Year</label>
+                <input id="record_year" name="record_year" type="number" min="1950" max="2100" value="{{ form.get('record_year', '') }}" class="field">
+            </div>
+        </div>
+        <div class="flex items-center gap-4">
+            <button type="submit" class="btn">Save Changes</button>
+            <a href="{{ url_for('manage_circuits') }}" class="tag hover:text-white">Cancel</a>
+        </div>
+    </form>
+</section>
+{% endblock %}

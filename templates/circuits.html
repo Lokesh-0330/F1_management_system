@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Circuits{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+    <p class="eyebrow">Track Data // Circuit Guide</p>
+    <h1 class="page-title">Circuits</h1>
+    <p class="muted mt-3 text-sm">Open a circuit to see its full details.</p>
+</div>
+
+<div class="space-y-3">
+    {% for c in circuits %}
+    <details class="panel">
+        <summary class="panel-head">
+            <div class="flex items-center gap-4 flex-wrap">
+                <h2 class="text-lg">{{ c.name }}</h2>
+                <span class="muted text-sm">{{ c.city }}, {{ c.country }}</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <span class="tag">{{ c.length_km }} km &middot; {{ c.race_laps }} laps</span>
+                <span class="arrow">&#9658;</span>
+            </div>
+        </summary>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 p-5">
+            <div><p class="lbl">Track length</p><p class="mono">{{ c.length_km }} km</p></div>
+            <div><p class="lbl">Race laps</p><p class="mono">{{ c.race_laps }}</p></div>
+            <div><p class="lbl">Race distance</p><p class="mono">{{ c.race_distance_km }} km</p></div>
+            <div><p class="lbl">Lap record</p><p class="mono purple font-bold">{{ c.lap_record_ms|lap }}</p></div>
+            <div class="col-span-2">
+                <p class="lbl">Record set by</p>
+                <p>{% if c.record_holder %}{{ c.record_holder }}{% if c.record_year %} ({{ c.record_year }}){% endif %}{% else %}&mdash;{% endif %}</p>
+            </div>
+            <div class="col-span-2">
+                <p class="lbl">Hosts</p>
+                <p>{{ c.hosts if c.hosts else '—' }}</p>
+            </div>
+        </div>
+    </details>
+    {% else %}
+    <div class="panel"><p class="empty">NO CIRCUITS FOUND</p></div>
+    {% endfor %}
+</div>
+{% endblock %}

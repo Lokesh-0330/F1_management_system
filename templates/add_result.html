@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}Manage Results{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+    <p class="eyebrow">Timing // Result Entry</p>
+    <h1 class="page-title">Manage Results</h1>
+</div>
+
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+    <section class="panel">
+        <div class="panel-head"><h2>Log Result</h2><span class="tag">INSERT</span></div>
+        <form method="post" action="{{ url_for('add_result') }}" class="p-5 space-y-4">
+            <div>
+                <label class="lbl" for="session_id">Session</label>
+                <select id="session_id" name="session_id" class="field" required>
+                    <option value="" disabled {% if not selected %}selected{% endif %}>Select session...</option>
+                    {% for s in sessions %}
+                    <option value="{{ s.session_id }}" {% if selected == s.session_id|string %}selected{% endif %}>
+                        R{{ s.round }} {{ s.race_name }} - {{ s.session_type }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label class="lbl" for="driver_id">Driver</label>
+                <select id="driver_id" name="driver_id" class="field" required>
+                    <option value="" disabled {% if not form.get('driver_id') %}selected{% endif %}>Select driver...</option>
+                    {% for d in drivers %}
+                    <option value="{{ d.driver_id }}" {% if form.get('driver_id') == d.driver_id|string %}selected{% endif %}>{{ d.code }} - {{ d.driver_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="lbl" for="grid_position">Grid (0 if n/a)</label>
+                    <input id="grid_position" name="grid_position" type="number" min="0" max="22" value="{{ form.get('grid_position', 0) }}" class="field" required>
+                </div>
+                <div>
+                    <label class="lbl" for="finish_position">Position</label>
+                    <input id="finish_position" name="finish_position" type="number" min="1" max="22" value="{{ form.get('finish_position', '') }}" class="field" required>
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="lbl" for="best_lap">Best / fastest lap</label>
+                    <input id="best_lap" name="best_lap" type="text" placeholder="1:19.234" pattern="\d{1,2}:[0-5]\d\.\d{1,3}" value="{{ form.get('best_lap', '') }}" class="field">
+                </div>
+                <div>
+                    <label class="lbl" for="status">Status</label>
+                    <select id="status" name="status" class="field">
+                        {% for st in ['Finished', 'DNF', 'DSQ'] %}
+                        <option value="{{ st }}" {% if form.get('status') == st %}selected{% endif %}>{{ st }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <p class="tag">Points are calculated automatically from the position.</p>
+            <button type="submit" class="btn w-full">Log Result</button>
+        </form>
+    </section>
+
+    <section class="panel xl:col-span-2">
+        <div class="panel-head">
+            <h2>Classifications</h2>
+            <form method="get" action="{{ url_for('add_result') }}" class="flex items-center gap-2">
+                <select name="session_id" class="field" style="width:15rem; padding:.3rem .5rem;">
+                    <option value="">Latest (all sessions)</option>
+                    {% for s in sessions %}
+                    <option value="{{ s.session_id }}" {% if filter_id == s.session_id %}selected{% endif %}>R{{ s.round }} {{ s.race_name }} - {{ s.session_type }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn-ghost">Show</button>
+            </form>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="tele">
+                <thead>
+                    <tr><th>Session</th><th class="num">Pos</th><th>Driver</th><th class="num">Lap</th><th class="num">Pts</th><th>Status</th><th></th></tr>
+                </thead>
+                <tbody>
+                    {% for r in results %}
+                    <tr>
+                        <td class="muted">R{{ r.round }} <span class="badge ml-1">{{ r.session_type }}</span></td>
+                        <td class="num font-bold">{{ r.finish_position }}</td>
+                        <td>
+                            <span class="chip team-chip" data-team="{{ r.team_name }}"></span>
+                            <span class="font-bold uppercase">{{ r.code }}</span>
+                        </td>
+                        <td class="num">{{ r.best_lap_ms|lap }}</td>
+                        <td class="num font-bold">{{ r.points }}</td>
+                        <td><span class="tag">{{ r.status }}</span></td>
+                        <td class="num" style="white-space:nowrap;">
+                            <a href="{{ url_for('edit_result', result_id=r.result_id) }}" class="btn-ghost">Edit</a>
+                            <form method="post" action="{{ url_for('delete_result', result_id=r.result_id) }}" class="inline"
+                                  onsubmit="return confirm('Delete this result? Its pit stops and penalties are removed too.');">
+                                <button type="submit" class="btn-ghost">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="7" class="empty">NO RESULTS FOUND</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+{% endblock %}

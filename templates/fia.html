@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block title %}FIA Stewards{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+    <p class="eyebrow">Race Direction // Stewards' Room</p>
+    <h1 class="page-title">FIA Penalties</h1>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+    <!-- LOG PENALTY FORM -->
+    <section class="panel">
+        <div class="panel-head"><h2>Log Penalty</h2><span class="tag">INSERT</span></div>
+        <form method="post" action="{{ url_for('fia') }}" class="p-5 space-y-4">
+            <div>
+                <label class="lbl" for="result_id">Driver / Session</label>
+                <select id="result_id" name="result_id" class="field" required>
+                    <option value="" disabled {% if not form.get('result_id') %}selected{% endif %}>Select entry...</option>
+                    {% for r in results %}
+                    <option value="{{ r.result_id }}" {% if form.get('result_id') == r.result_id|string %}selected{% endif %}>
+                        {{ r.race_name }} - {{ r.session_type }} - {{ r.code }} ({{ r.driver_name }})
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label class="lbl" for="penalty_type">Penalty Type</label>
+                <select id="penalty_type" name="penalty_type" class="field" required>
+                    {% for t in penalty_types %}
+                    <option value="{{ t }}" {% if form.get('penalty_type') == t %}selected{% endif %}>{{ t }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="lbl" for="penalty_seconds">Seconds</label>
+                    <input id="penalty_seconds" name="penalty_seconds" type="number" min="0" max="300"
+                           value="{{ form.get('penalty_seconds', 0) }}" class="field">
+                </div>
+                <div>
+                    <label class="lbl" for="license_points">Licence Pts</label>
+                    <input id="license_points" name="license_points" type="number" min="0" max="12"
+                           value="{{ form.get('license_points', 0) }}" class="field">
+                </div>
+            </div>
+            <div>
+                <label class="lbl" for="reason">Reason</label>
+                <textarea id="reason" name="reason" rows="3" maxlength="300" class="field" required>{{ form.get('reason', '') }}</textarea>
+            </div>
+            <button type="submit" class="btn">Issue Penalty</button>
+        </form>
+    </section>
+
+    <!-- LICENCE POINTS WATCH -->
+    <section class="panel lg:col-span-2">
+        <div class="panel-head">
+            <h2>Licence Points Watch</h2>
+            <span class="tag">GROUP BY driver &middot; HAVING pts &gt; 0</span>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="tele">
+                <thead>
+                    <tr><th>Driver</th><th>Team</th><th class="num">Penalties</th><th class="num">Time (s)</th><th class="num">Licence Pts</th></tr>
+                </thead>
+                <tbody>
+                    {% for w in watch %}
+                    <tr>
+                        <td>
+                            <span class="chip" style="--team-color: {{ TEAM_COLORS.get(w.team_name, '#2A2E3D') }}; background-color: var(--team-color);"></span>
+                            <span class="font-bold uppercase">{{ w.driver_name }}</span>
+                            <span class="tag ml-2">{{ w.code }}</span>
+                        </td>
+                        <td class="muted">{{ w.team_name }}</td>
+                        <td class="num">{{ w.penalty_count }}</td>
+                        <td class="num">{{ w.total_seconds }}</td>
+                        <td class="num font-bold text-lg">{{ w.total_points }} / 12</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="5" class="empty">NO DRIVERS CARRYING LICENCE POINTS</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+
+<!-- STEWARD HISTORY -->
+<section class="panel mt-6">
+    <div class="panel-head"><h2>Steward Decision History</h2><span class="tag">{{ history|length }} records</span></div>
+    <div class="overflow-x-auto">
+        <table class="tele">
+            <thead>
+                <tr>
+                    <th>Issued</th><th>Event</th><th>Driver</th><th>Penalty</th>
+                    <th class="num">Sec</th><th class="num">Pts</th><th>Reason</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in history %}
+                <tr>
+                    <td class="mono muted" style="white-space:nowrap;">{{ p.issued_at.strftime('%d %b %Y %H:%M') }}</td>
+                    <td>{{ p.race_name }} <span class="tag">{{ p.session_type }}</span></td>
+                    <td>
+                        <span class="chip" style="--team-color: {{ TEAM_COLORS.get(p.team_name, '#2A2E3D') }}; background-color: var(--team-color);"></span>
+                        <span class="font-bold uppercase">{{ p.code }}</span>
+                    </td>
+                    <td><span class="badge badge-pen">{{ p.penalty_type }}</span></td>
+                    <td class="num">{{ p.penalty_seconds }}</td>
+                    <td class="num">{{ p.license_points }}</td>
+                    <td class="muted">{{ p.reason }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="7" class="empty">NO PENALTIES ISSUED</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

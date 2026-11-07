@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% block title %}Race Weekends{% endblock %}
+{% block content %}
+
+{% macro lap_table(rows, colors, kind) %}
+<div class="overflow-x-auto">
+    <table class="tele">
+        <thead>
+            <tr>
+                <th>Pos</th>
+                {% if kind == 'race' %}<th>Grid</th>{% endif %}
+                <th>Driver</th><th>Team</th>
+                <th class="num">{{ 'Fastest Lap' if kind == 'race' else 'Best Lap' }}</th>
+                {% if kind == 'race' %}<th class="num">Pts</th><th>Status</th>{% else %}<th class="num">Gap</th>{% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in rows %}
+            <tr>
+                <td class="mono font-bold">{{ r.finish_position }}</td>
+                {% if kind == 'race' %}<td class="mono muted">{{ r.grid_position }}</td>{% endif %}
+                <td>
+                    <span class="chip" style="background-color: {{ colors.get(r.team_name, '#2A2E3D') }};"></span>
+                    <span class="font-bold uppercase">{{ r.driver_name }}</span>
+                    <span class="tag ml-2">{{ r.code }}</span>
+                </td>
+                <td class="muted">{{ r.team_name }}</td>
+                <td class="num {% if r.is_fastest %}purple font-bold{% endif %}">{{ r.best_lap_ms|lap }}</td>
+                {% if kind == 'race' %}
+                    <td class="num font-bold">{{ r.points }}</td>
+                    <td><span class="tag">{{ r.status }}</span></td>
+                {% else %}
+                    <td class="num muted">{{ r.gap_ms|gap }}</td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endmacro %}
+
+<div class="mb-8">
+    <p class="eyebrow">Season 2026 // Archive</p>
+    <h1 class="page-title">Race Weekends</h1>
+    <p class="muted mt-3 text-sm">Open a race, then open the session you want to see.</p>
+</div>
+
+<div class="space-y-4">
+    {% for race in races %}
+    {% set w = by_race.get(race.race_id, {}) %}
+    {% set h = highlights.get(race.race_id, {}) %}
+    {% set stops = stops_by_race.get(race.race_id, []) %}
+    
+    <details class="panel">
+        <summary class="panel-head">
+            <div class="flex items-center gap-4 flex-wrap">
+                <span class="mono text-xs text-f1red font-bold">RND {{ "%02d"|format(race.round) }}</span>
+                <h2 class="text-lg">{{ race.name }}</h2>
+                <span class="muted text-sm hidden md:inline">{{ race.circuit }}</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <span class="tag">{{ race.race_date.strftime('%d %b %Y') }}</span>
+                <span class="arrow">&#9658;</span>
+            </div>
+        </summary>
+        
+        <div class="p-4 space-y-3">
+            <details class="sub">
+                <summary><span>Circuit Info</span><span class="arrow">&#9658;</span></summary>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 p-4">
+                    <div><p class="lbl">Location</p><p>{{ race.city }}, {{ race.country }}</p></div>
+                    <div><p class="lbl">Track length</p><p class="mono">{{ race.length_km }} km</p></div>
+                    <div><p class="lbl">Race laps</p><p class="mono">{{ race.race_laps }}</p></div>
+                    <div><p class="lbl">Race distance</p><p class="mono">{{ race.race_distance_km }} km</p></div>
+                    <div class="col-span-2 md:col-span-4">
+                        <p class="lbl">Lap record</p>
+                        <p class="mono">{% if race.lap_record_ms %}{{ race.lap_record_ms|lap }} &middot; {{ race.record_holder }} ({{ race.record_year }}){% else %}&mdash;{% endif %}</p>
+                    </div>
+                </div>
+            </details>
+
+            {% if w %}
+            <div class="flex flex-wrap gap-2 pb-1">
+                {% if h.winner %}<span class="badge badge-red">Winner {{ h.winner }}</span>{% endif %}
+                {% if h.pole %}<span class="badge">Pole {{ h.pole }}</span>{% endif %}
+                {% if h.fastest %}<span class="badge badge-purple">Fastest lap {{ h.fastest }}</span>{% endif %}
+            </div>
+
+            <details class="sub">
+                <summary><span>Practice</span><span class="arrow">&#9658;</span></summary>
+                {% if w.get('FP1') or w.get('FP2') or w.get('FP3') %}
+                    {% for name in ['FP1', 'FP2', 'FP3'] %}
+                    {% if w.get(name) %}
+                    <p class="tag px-4 pt-3 pb-1">{{ name }}</p>
+                    {{ lap_table(w[name], TEAM_COLORS, 'session') }}
+                    {% endif %}
+                    {% endfor %}
+                {% else %}
+                <p class="empty">NO PRACTICE TIMES LOGGED</p>
+                {% endif %}
+            </details>
+
+            <details class="sub">
+                <summary><span>Qualifying</span><span class="arrow">&#9658;</span></summary>
+                {% if w.get('Qualifying') %}
+                {{ lap_table(w['Qualifying'], TEAM_COLORS, 'session') }}
+                {% else %}
+                <p class="empty">NO QUALIFYING TIMES LOGGED</p>
+                {% endif %}
+            </details>
+
+            <details class="sub">
+                <summary><span>Race Result</span><span class="arrow">&#9658;</span></summary>
+                {% if w.get('Race') %}
+                {{ lap_table(w['Race'], TEAM_COLORS, 'race') }}
+                {% else %}
+                <p class="empty">NO RACE RESULT LOGGED</p>
+                {% endif %}
+            </details>
+
+            <details class="sub">
+                <summary><span>Pit Stops</span><span class="arrow">&#9658;</span></summary>
+                {% if stops %}
+                <div class="overflow-x-auto">
+                    <table class="tele">
+                        <thead>
+                            <tr><th>Driver</th><th>Team</th><th class="num">Lap</th><th class="num">Time (s)</th><th>Tyre</th></tr>
+                        </thead>
+                        <tbody>
+                            {% for p in stops %}
+                            <tr>
+                                <td>
+                                    <span class="chip" style="background-color: {{ TEAM_COLORS.get(p.team_name, '#2A2E3D') }};"></span>
+                                    <span class="font-bold uppercase">{{ p.driver_name }}</span>
+                                    <span class="tag ml-2">{{ p.code }}</span>
+                                </td>
+                                <td class="muted">{{ p.team_name }}</td>
+                                <td class="num">{{ p.lap_number }}</td>
+                                <td class="num {% if p.is_fastest %}purple font-bold{% endif %}">{{ "%.2f"|format(p.stop_time_sec) }}</td>
+                                <td>
+                                    <span class="inline-block rounded-full mr-2" style="width:10px;height:10px;background-color: {{ TIRE_COLORS.get(p.tire_compound, '#FFFFFF') }};"></span>{{ p.tire_compound }}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="empty">NO PIT STOPS LOGGED</p>
+                {% endif %}
+            </details>
+
+            {% else %}
+            <p class="empty">NO SESSIONS CLASSIFIED YET</p>
+            {% endif %}
+        </div>
+    </details>
+    {% else %}
+    <div class="panel"><p class="empty">NO RACES FOUND</p></div>
+    {% endfor %}
+</div>
+{% endblock %}

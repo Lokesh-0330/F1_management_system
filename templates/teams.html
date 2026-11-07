@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Teams{% endblock %}
+{% block content %}
+<div class="mb-8">
+    <p class="eyebrow">Paddock // Constructor Registry</p>
+    <h1 class="page-title">Teams</h1>
+</div>
+
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+    <section class="panel">
+        <div class="panel-head"><h2>Add Team</h2><span class="tag">INSERT</span></div>
+        <form method="post" action="{{ url_for('manage_teams') }}" class="p-5 space-y-4">
+            <div>
+                <label class="lbl" for="name">Team name</label>
+                <input id="name" name="name" type="text" maxlength="60" value="{{ form.get('name', '') }}" class="field" required>
+            </div>
+            <div>
+                <label class="lbl" for="base_country">Base country</label>
+                <input id="base_country" name="base_country" type="text" maxlength="60" value="{{ form.get('base_country', '') }}" class="field" required>
+            </div>
+            <div>
+                <label class="lbl" for="team_principal">Team principal</label>
+                <input id="team_principal" name="team_principal" type="text" maxlength="80" value="{{ form.get('team_principal', '') }}" class="field" required>
+            </div>
+            <div>
+                <label class="lbl" for="team_color">Team colour</label>
+                <input id="team_color" name="team_color" type="color" value="{{ form.get('team_color', '#E10600') }}" class="field" style="height:2.6rem; padding:.2rem;">
+            </div>
+            <button type="submit" class="btn w-full">Add Team</button>
+        </form>
+    </section>
+
+    <section class="panel xl:col-span-2">
+        <div class="panel-head"><h2>Constructors</h2><span class="tag">{{ teams|length }} teams</span></div>
+        <div class="overflow-x-auto">
+            <table class="tele">
+                <thead>
+                    <tr><th>Team</th><th>Base</th><th>Principal</th><th class="num">Drivers</th><th></th></tr>
+                </thead>
+                <tbody>
+                    {% for t in teams %}
+                    <tr>
+                        <td>
+                            <span class="chip" style="background-color: {{ t.team_color }};"></span>
+                            <span class="font-bold uppercase">{{ t.name }}</span>
+                        </td>
+                        <td class="muted">{{ t.base_country }}</td>
+                        <td class="muted">{{ t.team_principal }}</td>
+                        <td class="num">{{ t.driver_count }}</td>
+                        <td class="num">
+                            <form method="post" action="{{ url_for('delete_team', team_id=t.team_id) }}"
+                                  onsubmit="return confirm('Remove this team? Its drivers and all their results, pit stops and penalties will be deleted too.');">
+                                <button type="submit" class="btn-ghost">Remove</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="5" class="empty">NO TEAMS REGISTERED</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+{% endblock %}

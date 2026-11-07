@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Reports{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+    <p class="eyebrow">Analytics // SQL Reports</p>
+    <h1 class="page-title">Reports</h1>
+    <p class="muted mt-3 text-sm">Each report is one SQL query. Open it to see the result, then open "View SQL" to see the query.</p>
+</div>
+
+<div class="space-y-3">
+    {% for rep in reports %}
+    <details class="panel">
+        <summary class="panel-head">
+            <h2>{{ rep.title }}</h2>
+            <div class="flex items-center gap-4">
+                <span class="tag">{{ rep.concept }}</span>
+                <span class="arrow">&#9658;</span>
+            </div>
+        </summary>
+        <div class="p-4 space-y-3">
+            {% if rep.rows %}
+            <div class="overflow-x-auto">
+                <table class="tele">
+                    <thead>
+                        <tr>{% for col in rep.columns %}<th>{{ col.replace('_', ' ') }}</th>{% endfor %}</tr>
+                    </thead>
+                    <tbody>
+                        {% for row in rep.rows %}
+                        <tr>
+                            {% for col in rep.columns %}
+                            <td class="mono">
+                                {% if col.endswith('_ms') %}{{ row[col]|lap }}
+                                {% elif row[col] is none %}&mdash;
+                                {% else %}{{ row[col] }}{% endif %}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="empty">NO ROWS RETURNED</p>
+            {% endif %}
+
+            <details class="sub">
+                <summary><span>View SQL</span><span class="arrow">&#9658;</span></summary>
+                <pre class="mono text-xs p-4 overflow-x-auto">{{ rep.sql }}</pre>
+            </details>
+        </div>
+    </details>
+    {% endfor %}
+</div>
+{% endblock %}

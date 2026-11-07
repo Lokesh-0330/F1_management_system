@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login | F1 Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Titillium+Web:ital,wght@0,700;1,900&display=swap" rel="stylesheet">
+    <style>
+        body { background: #0E1015; font-family: 'Titillium Web', sans-serif; }
+        .field { width: 100%; background: #0E1015; border: 1px solid #2A2E3D; color: #fff; padding: .6rem .75rem; font-family: 'JetBrains Mono', monospace; font-size: .85rem; }
+        .field:focus { outline: none; border-color: #E10600; }
+        .btn { background: #E10600; color: #fff; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; padding: .7rem 1.5rem; border: 0; cursor: pointer; clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%); transition: background .15s; width: 100%; }
+        .btn:hover { background: #ff1a12; }
+    </style>
+</head>
+<body class="min-h-screen text-white flex flex-col justify-center items-center px-4">
+
+    <div class="max-w-md w-full bg-[#151821] border border-[#2A2E3D] p-8 rounded-lg relative">
+        <!-- Top accent line -->
+        <div class="absolute top-[-1px] left-[-1px] w-8 h-[3px] bg-[#E10600]"></div>
+        
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-black italic uppercase tracking-wider">Pit Wall Login</h1>
+            <p class="font-mono text-slate-400 mt-2 text-xs tracking-widest uppercase">Authorized Personnel Only</p>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+            <div class="font-mono text-xs p-3 mb-6 border {% if category == 'error' %}border-red-500 text-red-500 bg-red-900/20{% else %}border-green-500 text-green-500 bg-green-900/20{% endif %}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <form method="post" action="{{ url_for('login') }}" class="space-y-5">
+            <div>
+                <label class="block font-mono text-xs tracking-widest uppercase text-slate-400 mb-2">Username</label>
+                <input type="text" name="username" class="field" required autofocus>
+            </div>
+            <div>
+                <label class="block font-mono text-xs tracking-widest uppercase text-slate-400 mb-2">Password</label>
+                <input type="password" name="password" class="field" required>
+            </div>
+            <button type="submit" class="btn mt-4">Authenticate</button>
+        </form>
+        
+        <div class="text-center mt-6">
+            <a href="{{ url_for('hub') }}" class="font-mono text-xs text-slate-500 hover:text-white transition">&larr; Return to Gateway</a>
+        </div>
+    </div>
+</body>
+</html>

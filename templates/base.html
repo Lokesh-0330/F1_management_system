@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Pit Wall{% endblock %} | F1 Management System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Titillium+Web:ital,wght@0,400;0,600;0,700;0,900;1,700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { asphalt: '#0E1015', panel: '#151821', f1red: '#E10600', carbon: '#2A2E3D' },
+                    fontFamily: { sans: ['"Titillium Web"', 'sans-serif'], mono: ['"JetBrains Mono"', 'monospace'] }
+                }
+            }
+        };
+    </script>
+    <style>
+        body { background-color: #0E1015; background-image: linear-gradient(rgba(42,46,61,.30) 1px, transparent 1px), linear-gradient(90deg, rgba(42,46,61,.30) 1px, transparent 1px); background-size: 44px 44px; }
+        .eyebrow { font-family: 'JetBrains Mono', monospace; font-size: .7rem; letter-spacing: .25em; text-transform: uppercase; color: #E10600; }
+        .page-title { font-weight: 900; font-style: italic; text-transform: uppercase; font-size: 2.6rem; line-height: 1; margin-top: .35rem; }
+        .tag { font-family: 'JetBrains Mono', monospace; font-size: .65rem; letter-spacing: .15em; text-transform: uppercase; color: rgba(255,255,255,.45); }
+        .panel { background: #151821; border: 1px solid #2A2E3D; position: relative; }
+        .panel::before { content: ""; position: absolute; top: -1px; left: -1px; width: 28px; height: 3px; background: #E10600; }
+        .panel-head { display: flex; justify-content: space-between; align-items: center; padding: .85rem 1.1rem; border-bottom: 1px solid #2A2E3D; }
+        .panel-head h2 { font-weight: 700; text-transform: uppercase; letter-spacing: .08em; font-size: 1rem; }
+        .tele { width: 100%; border-collapse: collapse; }
+        .tele th { font-family: 'JetBrains Mono', monospace; font-size: .62rem; letter-spacing: .15em; text-transform: uppercase; color: rgba(255,255,255,.45); text-align: left; padding: .65rem .8rem; border-bottom: 1px solid #2A2E3D; white-space: nowrap; }
+        .tele td { padding: .7rem .8rem; border-bottom: 1px solid rgba(42,46,61,.7); vertical-align: middle; }
+        .tele tbody tr:hover { background: rgba(225,6,0,.06); }
+        .tele tr.lead td:first-child { box-shadow: inset 3px 0 0 #E10600; }
+        .num { font-family: 'JetBrains Mono', monospace; text-align: right !important; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        .muted { color: rgba(255,255,255,.5); }
+        .empty { text-align: center; padding: 2rem; color: rgba(255,255,255,.4); font-family: 'JetBrains Mono', monospace; font-size: .8rem; }
+        .chip { display: inline-block; width: 4px; height: 1.1rem; margin-right: .6rem; vertical-align: middle; }
+        .badge { font-family: 'JetBrains Mono', monospace; font-size: .65rem; letter-spacing: .12em; text-transform: uppercase; padding: .2rem .5rem; border: 1px solid #2A2E3D; }
+        .lbl { display: block; font-family: 'JetBrains Mono', monospace; font-size: .65rem; letter-spacing: .15em; text-transform: uppercase; color: rgba(255,255,255,.55); margin-bottom: .35rem; }
+        .field { width: 100%; background: #0E1015; border: 1px solid #2A2E3D; color: #fff; padding: .6rem .75rem; font-family: 'JetBrains Mono', monospace; font-size: .85rem; }
+        .field:focus { outline: none; border-color: #E10600; }
+        select.field option { background: #0E1015; color: #fff; }
+        .btn { background: #E10600; color: #fff; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; padding: .7rem 1.5rem; border: 0; cursor: pointer; clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%); transition: background .15s; }
+        .btn:hover { background: #ff1a12; }
+        .flash { padding: .75rem 1rem; border: 1px solid #2A2E3D; border-left: 4px solid #fff; background: #151821; font-family: 'JetBrains Mono', monospace; font-size: .8rem; }
+        .flash-error { border-left-color: #E10600; background: rgba(225,6,0,.12); }
+        .flash-success { border-left-color: #fff; }
+        .nav-link { font-weight: 700; text-transform: uppercase; letter-spacing: .1em; font-size: .85rem; padding: .5rem 0; border-bottom: 2px solid transparent; color: rgba(255,255,255,.65); }
+        .nav-link:hover { color: #fff; }
+        .nav-link.active { color: #fff; border-bottom-color: #E10600; }
+    </style>
+</head>
+<body class="font-sans text-white min-h-screen flex flex-col">
+    <div class="h-1 bg-f1red"></div>
+    <header class="bg-asphalt border-b border-carbon">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-wrap items-center justify-between gap-4">
+            <a href="{{ url_for('hub') }}" class="flex items-center gap-3">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/3/33/F1.svg" alt="Formula 1 Logo" class="h-7 w-auto">
+                <span class="leading-tight"><span class="block font-black uppercase tracking-wide text-lg">Management System</span></span>
+            </a>
+                       <nav class="flex flex-wrap items-center gap-5">
+                {% if view_type == 'admin' %}
+                    <a href="{{ url_for('manage_teams') }}"    class="nav-link {% if request.endpoint == 'manage_teams' %}active{% endif %}">Teams</a>
+                    <a href="{{ url_for('add_driver') }}"      class="nav-link {% if request.endpoint == 'add_driver' %}active{% endif %}">Drivers</a>
+                    <a href="{{ url_for('manage_circuits') }}" class="nav-link {% if request.endpoint in ('manage_circuits', 'edit_circuit') %}active{% endif %}">Circuits</a>
+                    <a href="{{ url_for('add_race') }}"        class="nav-link {% if request.endpoint == 'add_race' %}active{% endif %}">Schedule</a>
+                    <a href="{{ url_for('add_result') }}"      class="nav-link {% if request.endpoint in ('add_result', 'edit_result') %}active{% endif %}">Results</a>
+                    <a href="{{ url_for('pitstops') }}"        class="nav-link {% if request.endpoint == 'pitstops' %}active{% endif %}">Pit Stops</a>
+                    <a href="{{ url_for('fia') }}"             class="nav-link {% if request.endpoint == 'fia' %}active{% endif %}">FIA</a>
+                    <a href="{{ url_for('logout') }}"          class="tag hover:text-white transition-colors" style="color:#E10600;">[ Logout ]</a>
+                {% else %}
+                    <a href="{{ url_for('standings') }}"   class="nav-link {% if request.endpoint == 'standings' %}active{% endif %}">Standings</a>
+                    <a href="{{ url_for('schedule') }}"    class="nav-link {% if request.endpoint == 'schedule' %}active{% endif %}">Schedule</a>
+                    <a href="{{ url_for('circuits') }}"    class="nav-link {% if request.endpoint == 'circuits' %}active{% endif %}">Circuits</a>
+                    <a href="{{ url_for('fan_results') }}" class="nav-link {% if request.endpoint == 'fan_results' %}active{% endif %}">Race Weekends</a>
+                    <a href="{{ url_for('reports') }}"     class="nav-link {% if request.endpoint == 'reports' %}active{% endif %}">Reports</a>
+                    <a href="{{ url_for('hub') }}"         class="tag hover:text-white transition-colors" style="color:#E10600;">[ Exit ]</a>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="max-w-7xl w-full mx-auto px-4 pt-6 space-y-2">
+        {% for category, message in messages %}
+        <div class="flash flash-{{ category }}"><span class="tag" style="color:#fff;">{{ 'ERR' if category == 'error' else 'OK' }} //</span> {{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-10">
+        {% block content %}{% endblock %}
+    </main>
+    <footer class="border-t border-carbon bg-asphalt">
+        <div class="max-w-7xl mx-auto px-4 py-5 flex flex-wrap justify-between gap-2">
+            <span class="tag">F1 Management System // Database Systems Project</span>
+            <span class="tag">Flask + PostgreSQL + psycopg2</span>
+        </div>
+    </footer>
+</body>
+</html>

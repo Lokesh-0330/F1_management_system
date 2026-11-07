@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gateway | F1 Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Titillium+Web:ital,wght@0,700;1,900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #0E1015;
+            background-image: linear-gradient(rgba(42,46,61,.30) 1px, transparent 1px), linear-gradient(90deg, rgba(42,46,61,.30) 1px, transparent 1px);
+            background-size: 44px 44px;
+            font-family: 'Titillium Web', sans-serif;
+        }
+        .btn-card { transition: all 0.2s ease-in-out; border: 1px solid #2A2E3D; position: relative; }
+        .btn-card:hover { border-color: #E10600; transform: translateY(-4px); }
+        .btn-card::before { content: ""; position: absolute; top: -1px; left: -1px; width: 28px; height: 3px; background: #E10600; }
+    </style>
+</head>
+<body class="min-h-screen text-white flex flex-col justify-center items-center px-4">
+
+    <div class="text-center mb-12">
+        <div class="inline-block mb-3">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/3/33/F1.svg" alt="Formula 1 Logo" class="h-12 w-auto mx-auto">
+        </div>
+        <h1 class="text-4xl md:text-5xl font-black italic uppercase tracking-wider">Management System</h1>
+        <p class="font-mono text-slate-400 mt-2 text-xs tracking-widest uppercase">Select Access Mode</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl w-full">
+        <!-- FAN PORTAL CARD -->
+        <a href="{{ url_for('standings') }}" class="btn-card bg-[#151821] p-8 flex flex-col justify-between">
+            <div>
+                <span class="font-mono text-xs text-[#E10600] font-bold uppercase tracking-widest block mb-1">Public Portal</span>
+                <h2 class="text-3xl font-black italic uppercase text-white">Fan Telemetry</h2>
+                <p class="text-slate-400 mt-3 text-sm leading-relaxed">
+                    View Live Driver & Constructor Standings, Race Calendar timetables, and Pit Stop Performance metrics.
+                </p>
+            </div>
+            <div class="mt-8 font-mono text-[#E10600] text-xs font-bold tracking-widest flex items-center">
+                ENTER FAN PORTAL &rarr;
+            </div>
+        </a>
+
+        <!-- ADMIN CONTROL DESK CARD -->
+        <a href="{{ url_for('login') }}" class="btn-card bg-[#151821] p-8 flex flex-col justify-between">
+            <div>
+                <span class="font-mono text-xs text-yellow-500 font-bold uppercase tracking-widest block mb-1">Management Desk</span>
+                <h2 class="text-3xl font-black italic uppercase text-white">Pit Wall Control</h2>
+                <p class="text-slate-400 mt-3 text-sm leading-relaxed">
+                    Manage Driver Registry, schedule Grand Prix races, log session finish results, and issue FIA steward penalties.
+                </p>
+            </div>
+            <div class="mt-8 font-mono text-yellow-500 text-xs font-bold tracking-widest flex items-center">
+                ACCESS CONTROL ROOM &rarr;
+            </div>
+        </a>
+    </div>
+
+    <footer class="mt-16 font-mono text-xs text-slate-500 uppercase tracking-widest">
+        F1 Management System &middot; Database Systems Project
+    </footer>
+
+</body>
+</html>

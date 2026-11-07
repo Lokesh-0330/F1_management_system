@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Edit Result{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+    <p class="eyebrow">Timing // Update Entry</p>
+    <h1 class="page-title">Edit Result</h1>
+</div>
+
+<section class="panel max-w-xl">
+    <div class="panel-head">
+        <h2>{{ entry.code }} &middot; {{ entry.race_name }}</h2>
+        <span class="tag">{{ entry.session_type }}</span>
+    </div>
+    <form method="post" action="{{ url_for('edit_result', result_id=entry.result_id) }}" class="p-5 space-y-4">
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label class="lbl" for="grid_position">Grid (0 if n/a)</label>
+                <input id="grid_position" name="grid_position" type="number" min="0" max="22" value="{{ form.get('grid_position', 0) }}" class="field" required>
+            </div>
+            <div>
+                <label class="lbl" for="finish_position">Position</label>
+                <input id="finish_position" name="finish_position" type="number" min="1" max="22" value="{{ form.get('finish_position', '') }}" class="field" required>
+            </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label class="lbl" for="best_lap">Best / fastest lap</label>
+                <input id="best_lap" name="best_lap" type="text" placeholder="1:19.234" pattern="\d{1,2}:[0-5]\d\.\d{1,3}" value="{{ form.get('best_lap', '') }}" class="field">
+            </div>
+            <div>
+                <label class="lbl" for="status">Status</label>
+                <select id="status" name="status" class="field">
+                    {% for st in statuses %}
+                    <option value="{{ st }}" {% if form.get('status') == st %}selected{% endif %}>{{ st }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <p class="tag">Points are recalculated from the new position when you save.</p>
+        <div class="flex items-center gap-4">
+            <button type="submit" class="btn">Save Changes</button>
+            <a href="{{ url_for('add_result', session_id=entry.session_id) }}" class="tag hover:text-white">Cancel</a>
+        </div>
+    </form>
+</section>
+{% endblock %}

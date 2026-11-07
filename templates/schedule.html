@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Schedule{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+    <p class="eyebrow">Season 2026 // Race Calendar</p>
+    <h1 class="page-title">Schedule</h1>
+</div>
+
+<div class="space-y-4">
+    {% for race in races %}
+    <article class="panel p-5 flex flex-col lg:flex-row lg:items-center gap-5">
+        <div class="mono text-4xl font-bold text-f1red lg:w-24">R{{ "%02d"|format(race.round) }}</div>
+
+        <div class="flex-1">
+            <h2 class="text-xl font-black uppercase italic">{{ race.name }}</h2>
+            <p class="muted">{{ race.circuit }} &middot; {{ race.country }}</p>
+            <div class="flex flex-wrap gap-2 mt-3">
+                {% for s in sessions_by_race.get(race.race_id, []) %}
+                <span class="badge {% if s.session_type == 'Race' %}badge-red{% endif %}">
+                    {{ s.session_type }} &middot; {{ s.session_start.strftime('%a %d %b %H:%M') }} UTC
+                </span>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="lg:text-right">
+            <p class="mono text-lg font-bold">{{ race.race_date.strftime('%d %b %Y') }}</p>
+            {% if race.race_status == 'Completed' %}
+                <span class="badge">Completed</span>
+                {% if race.winner_name %}
+                <p class="tag mt-2">Winner</p>
+                <p class="font-bold uppercase">{{ race.winner_name }}</p>
+                {% endif %}
+            {% else %}
+                <span class="badge badge-red">Upcoming</span>
+            {% endif %}
+        </div>
+    </article>
+    {% else %}
+    <div class="panel"><p class="empty">NO RACES SCHEDULED</p></div>
+    {% endfor %}
+</div>
+{% endblock %}

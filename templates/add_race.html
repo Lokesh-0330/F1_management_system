@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Manage Schedule{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+    <p class="eyebrow">Calendar // Schedule Entry</p>
+    <h1 class="page-title">Manage Schedule</h1>
+</div>
+
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+    <section class="panel">
+        <div class="panel-head"><h2>New Race Weekend</h2><span class="tag">INSERT</span></div>
+        <form method="post" action="{{ url_for('add_race') }}" class="p-6 space-y-4">
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="lbl" for="round">Round</label>
+                    <input id="round" name="round" type="number" min="1" max="30" value="{{ form.get('round', '') }}" class="field" required>
+                </div>
+                <div>
+                    <label class="lbl" for="race_date">Race date</label>
+                    <input id="race_date" name="race_date" type="date" value="{{ form.get('race_date', '') }}" class="field" required>
+                </div>
+            </div>
+            <div>
+                <label class="lbl" for="name">Grand Prix name</label>
+                <input id="name" name="name" type="text" maxlength="80" placeholder="e.g. Japanese Grand Prix" value="{{ form.get('name', '') }}" class="field" required>
+            </div>
+            <div>
+                <label class="lbl" for="circuit_id">Circuit</label>
+                <select id="circuit_id" name="circuit_id" class="field" required>
+                    <option value="" disabled {% if not form.get('circuit_id') %}selected{% endif %}>Select circuit...</option>
+                    {% for c in circuits %}
+                    <option value="{{ c.circuit_id }}" {% if form.get('circuit_id') == c.circuit_id|string %}selected{% endif %}>{{ c.name }} ({{ c.country }})</option>
+                    {% endfor %}
+                </select>
+                <p class="tag mt-2">Circuit not listed? Add it on the Circuits page first.</p>
+            </div>
+            <p class="tag">Creates FP1, FP2, FP3, Qualifying and Race together.</p>
+            <button type="submit" class="btn w-full">Create Weekend</button>
+        </form>
+    </section>
+
+    <section class="panel xl:col-span-2">
+        <div class="panel-head"><h2>Current Calendar</h2><span class="tag">{{ races|length }} events</span></div>
+        <div class="overflow-x-auto">
+            <table class="tele">
+                <thead><tr><th>Rnd</th><th>Grand Prix</th><th>Circuit</th><th>Date</th></tr></thead>
+                <tbody>
+                    {% for r in races %}
+                    <tr>
+                        <td class="mono font-bold">{{ "%02d"|format(r.round) }}</td>
+                        <td class="font-bold uppercase">{{ r.name }}</td>
+                        <td class="muted">{{ r.circuit }}</td>
+                        <td class="mono muted">{{ r.race_date.strftime('%d %b %Y') }}</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="4" class="empty">NO RACES SCHEDULED</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+{% endblock %}

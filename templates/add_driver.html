@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}Register Driver{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+    <p class="eyebrow">Paddock // Driver Registry</p>
+    <h1 class="page-title">Register Driver</h1>
+</div>
+
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+
+    <!-- REGISTER FORM -->
+    <section class="panel">
+        <div class="panel-head"><h2>New Entry</h2><span class="tag">INSERT</span></div>
+        <form method="post" action="{{ url_for('add_driver') }}" class="p-5 space-y-4">
+            <div>
+                <label class="lbl" for="team_id">Team</label>
+                <select id="team_id" name="team_id" class="field" required>
+                    <option value="" disabled {% if not form.get('team_id') %}selected{% endif %}>Select team...</option>
+                    {% for t in teams %}
+                    <option value="{{ t.team_id }}" {% if form.get('team_id') == t.team_id|string %}selected{% endif %}>{{ t.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="lbl" for="driver_number">Number (1-99)</label>
+                    <input id="driver_number" name="driver_number" type="number" min="1" max="99"
+                           value="{{ form.get('driver_number', '') }}" class="field" required>
+                </div>
+                <div>
+                    <label class="lbl" for="code">Code (3 letters)</label>
+                    <input id="code" name="code" type="text" minlength="3" maxlength="3"
+                           pattern="[A-Za-z]{3}" style="text-transform: uppercase;"
+                           value="{{ form.get('code', '') }}" class="field" required>
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="lbl" for="first_name">First Name</label>
+                    <input id="first_name" name="first_name" type="text" maxlength="50"
+                           value="{{ form.get('first_name', '') }}" class="field" required>
+                </div>
+                <div>
+                    <label class="lbl" for="last_name">Last Name</label>
+                    <input id="last_name" name="last_name" type="text" maxlength="50"
+                           value="{{ form.get('last_name', '') }}" class="field" required>
+                </div>
+            </div>
+            <div>
+                <label class="lbl" for="nationality">Nationality</label>
+                <input id="nationality" name="nationality" type="text" maxlength="50"
+                       value="{{ form.get('nationality', '') }}" class="field" required>
+            </div>
+            <div>
+                <label class="lbl" for="date_of_birth">Date of Birth</label>
+                <input id="date_of_birth" name="date_of_birth" type="date"
+                       value="{{ form.get('date_of_birth', '') }}" class="field" required>
+            </div>
+            <button type="submit" class="btn">Register Driver</button>
+        </form>
+    </section>
+
+    <!-- CURRENT GRID -->
+    <section class="panel xl:col-span-2">
+        <div class="panel-head"><h2>Current Grid</h2><span class="tag">{{ drivers|length }} drivers</span></div>
+        <div class="overflow-x-auto">
+            <table class="tele">
+                <thead>
+                    <tr><th>No</th><th>Driver</th><th>Team</th><th>Nationality</th><th>Born</th><th></th></tr>
+                </thead>
+                <tbody>
+                    {% for d in drivers %}
+                    <tr>
+                        <td class="mono font-bold">{{ d.driver_number }}</td>
+                        <td>
+                            <span class="chip" style="--team-color: {{ TEAM_COLORS.get(d.team_name, '#2A2E3D') }}; background-color: var(--team-color);"></span>
+                            <span class="font-bold uppercase">{{ d.first_name }} {{ d.last_name }}</span>
+                            <span class="tag ml-2">{{ d.code }}</span>
+                        </td>
+                        <td class="muted">{{ d.team_name }}</td>
+                        <td class="muted">{{ d.nationality }}</td>
+                        <td class="mono muted">{{ d.date_of_birth.strftime('%d %b %Y') }}</td>
+                        <td class="num">
+                            <form method="post" action="{{ url_for('delete_driver', driver_id=d.driver_id) }}"
+                                  onsubmit="return confirm('Remove {{ d.code }}? Their results, pit stops and penalties will also be deleted.');">
+                                <button type="submit" class="btn btn-ghost">Remove</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="6" class="empty">NO DRIVERS REGISTERED</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+{% endblock %}
